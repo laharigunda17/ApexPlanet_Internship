@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete Project</title>
+<style>
+    /* General Reset */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0; padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+    /* Header & Navigation with Flexbox */
+    header {
+        background-color: #333;
+        color: #fff;
+        padding: 1em 0;
+    }
+    nav {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+    nav a {
+        color: white;
+        text-decoration: none;
+        padding: 0.5em 1em;
+        border-radius: 5px;
+    }
+    nav a:hover { background-color: #555; }
+
+    /* Main Layout with CSS Grid */
+    main {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+    }
+    .content { grid-column: 1; }
+    .sidebar {
+        grid-column: 2;
+        background: #eee;
+        padding: 1em;
+    }
+    footer {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 1em 0;
+    }
+
+    /* Contact Form Styling */
+    .contact-container, .todo-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 500px;
+        margin: 20px auto;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+    }
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .submit-button, .todo-container button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .submit-button:hover, .todo-container button:hover {
+        background-color: #0056b3;
+    }
+    .error-message {
+        color: red;
+        font-size: 12px;
+    }
+
+    /* To-Do List */
+    .todo-container input[type="text"] {
+        width: 70%;
+        padding: 8px;
+    }
+    .todo-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .todo-container li {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .todo-container li button {
+        background-color: #dc3545;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        main { grid-template-columns: 1fr; }
+        .sidebar { grid-column: 1; }
+        nav { flex-direction: column; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1 style="text-align:center;">My Website</h1>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+    </nav>
+</header>
+
+<main>
+    <section class="content">
+        <h2>Main Content</h2>
+        <p>This is where the main content goes.</p>
+
+        <!-- Contact Form -->
+        <div class="contact-container">
+            <h2>Contact Us</h2>
+            <form id="contactForm" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name">
+                    <div id="nameError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email">
+                    <div id="emailError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message"></textarea>
+                    <div id="messageError" class="error-message"></div>
+                </div>
+                <button type="submit" class="submit-button">Submit</button>
+            </form>
+        </div>
+
+        <!-- To-Do List -->
+        <div class="todo-container">
+            <h2>To-Do List</h2>
+            <input type="text" id="newTask" placeholder="Add new task">
+            <button onclick="addTask()">Add</button>
+            <ul id="taskList"></ul>
+        </div>
+    </section>
+
+    <aside class="sidebar">
+        <h3>Sidebar</h3>
+        <p>Additional links or information can go here.</p>
+    </aside>
+</main>
+
+<footer>
+    <p>&copy; 2025 My Website</p>
+</footer>
+
+<script>
+    // Contact Form Validation
+    function validateForm() {
+        let name = document.getElementById("name").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let message = document.getElementById("message").value.trim();
+        let isValid = true;
+
+        document.getElementById("nameError").textContent = 
+            name === "" ? "Name is required." : "";
+        if(name === "") isValid = false;
+
+        if(email === "") {
+            document.getElementById("emailError").textContent = "Email is required.";
+            isValid = false;
+        } else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById("emailError").textContent = "Invalid email format.";
+            isValid = false;
+        } else {
+            document.getElementById("emailError").textContent = "";
+        }
+
+        document.getElementById("messageError").textContent = 
+            message === "" ? "Message is required." : "";
+        if(message === "") isValid = false;
+
+        return isValid;
+    }
+
+    // To-Do List
+    function addTask() {
+        let taskText = document.getElementById("newTask").value.trim();
+        if(taskText) {
+            let li = document.createElement("li");
+            li.textContent = taskText;
+
+            let delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            delBtn.onclick = function() {
+                li.remove();
+            };
+
+            li.appendChild(delBtn);
+            document.getElementById("taskList").appendChild(li);
+            document.getElementById("newTask").value = "";
+        }
+    }
+</script>
+
+</body>
+</html>
