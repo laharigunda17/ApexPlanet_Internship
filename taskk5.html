@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instrument Store — Demo</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,Arial,sans-serif;background:#f6f8fb;color:#111;line-height:1.45}
+    .container{max-width:1100px;margin:0 auto;padding:1rem}
+    .topbar{background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.06);position:sticky;top:0;z-index:20}
+    .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem}
+    .brand a{text-decoration:none;color:#0b66ff;font-weight:700;font-size:1.25rem}
+    .nav{display:flex;gap:.5rem;align-items:center}
+    .nav input{padding:.4rem .6rem;border:1px solid #ddd;border-radius:8px}
+    .nav button{background:transparent;border:1px solid #ddd;padding:.4rem .6rem;border-radius:8px;cursor:pointer}
+    .badge{background:#0b66ff;color:#fff;padding:.15rem .45rem;border-radius:999px;margin-left:.25rem;font-size:.8rem}
+    .hero{padding:1.2rem 0;text-align:center}
+    .lead{color:#666;margin-top:.5rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1rem}
+    .card{background:#fff;padding:1rem;border-radius:10px;box-shadow:0 6px 20px rgba(12,18,30,.05);display:flex;flex-direction:column;gap:.5rem}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .card h3{font-size:1rem}
+    .card p{font-size:.9rem;color:#666}
+    .row{display:flex;gap:.5rem;align-items:center}
+    .space{justify-content:space-between}
+    .btn{padding:.35rem .6rem;border-radius:8px;border:0;background:#111;color:#fff;cursor:pointer}
+    .btn.ghost{background:transparent;color:#0b66ff;border:1px solid #ddd}
+    .btn.primary{background:#0b66ff}
+    .drawer{position:fixed;right:0;top:0;height:100%;width:340px;transform:translateX(110%);transition:.25s;z-index:30;background:#fff;box-shadow:-6px 0 25px rgba(0,0,0,.08);display:flex;flex-direction:column}
+    .drawer.open{transform:none}
+    .drawer-header{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #eee}
+    .drawer-items{flex:1;overflow:auto;padding:1rem}
+    .drawer-footer{padding:1rem;border-top:1px solid #eee}
+    .cart-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem}
+    .cart-controls{display:flex;gap:.4rem;align-items:center}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);z-index:40;padding:1rem}
+    .modal.show{display:flex}
+    .modal-content{background:#fff;width:min(720px,100%);border-radius:12px;padding:1rem;position:relative}
+    .modal-close{position:absolute;right:8px;top:8px;border:0;background:transparent;cursor:pointer;font-size:1.1rem}
+    .muted{color:#666}.small{font-size:.85rem}
+    @media(max-width:600px){.card img{height:140px}.drawer{width:100%;max-width:420px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand"><a href="#">Instrument Store</a></div>
+      <nav class="nav">
+        <input id="searchBox" type="text" placeholder="Search..." />
+        <button id="wishlistToggle">Wishlist <span id="wishCount" class="badge">0</span></button>
+        <button id="cartToggle">Cart <span id="cartCount" class="badge">0</span></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Musical Instruments</h1>
+      <p class="lead">"Instruments that sing your story."</p>
+    </section>
+    <section>
+      <div id="productGrid" class="grid" role="list"></div>
+    </section>
+  </main>
+
+  <!-- Cart drawer -->
+  <aside id="cartDrawer" class="drawer" aria-hidden="true">
+    <header class="drawer-header">
+      <h3>Your Cart</h3>
+      <button id="closeCart">✕</button>
+    </header>
+    <div id="cartItems" class="drawer-items"></div>
+    <footer class="drawer-footer">
+      <div class="row space"><strong>Total:</strong><span id="cartTotal">₹0.00</span></div>
+      <button id="checkoutBtn" class="btn primary">Checkout</button>
+    </footer>
+  </aside>
+
+  <!-- Wishlist drawer -->
+  <aside id="wishDrawer" class="drawer" aria-hidden="true">
+    <header class="drawer-header">
+      <h3>Your Wishlist</h3>
+      <button id="closeWish">✕</button>
+    </header>
+    <div id="wishItems" class="drawer-items"></div>
+  </aside>
+
+  <!-- Modal -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <button id="closeModal" class="modal-close">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+const PRODUCTS=[
+ // 🎸 String
+ {id:1,title:"Acoustic Guitar",price:2000,desc:"Acoustic Guitar — ₹2,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9-6g0LntGpD-u0qlMblrg9qDJLDdZxswPUQ&s"},
+ {id:2,title:"Electric Guitar",price:5000,desc:"Electric Guitar — ₹5,000",img:"https://media.sweetwater.com/m/insync/2022/06/Featured-Guitar-9-Exceptional-Electric-Guitars.jpg"},
+ {id:3,title:"Violin",price:5000,desc:"Violin — ₹5,000",img:"https://images.pexels.com/photos/3120109/pexels-photo-3120109.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},
+ {id:4,title:"Ukulele",price:5000,desc:"Ukulele — ₹5,000",img:"https://cdn.thewirecutter.com/wp-content/media/2024/09/ukuleles-2048px-05242.jpg?auto=webp&quality=75&width=1024"},
+ {id:5,title:"Sitar",price:25000,desc:"Sitar — ₹25,000",img:"https://www.sitarfactory.be/fotos/Repairs%26Maintenance/MicroSitar/20241211_113513_re.jpg"},
+ {id:6,title:"Veena",price:15000,desc:"Veena — ₹15,000",img:"https://divyavadya.com/wp-content/uploads/2019/09/rudra-veena.jpeg"},
+
+ // 🥁 Percussion
+ {id:7,title:"Tabla (pair)",price:15000,desc:"Tabla (pair) — ₹15,000",img:"https://i0.wp.com/www.binaswar.com/wp-content/uploads/2019/08/AB0_2444-1.jpg?fit=1200%2C651&ssl=1"},
+ {id:8,title:"Mridangam",price:10000,desc:"Mridangam — ₹10,000",img:"https://kalyanimusical.com/wp-content/uploads/2021/09/bold-type-midhangam-24inch.jpg"},
+ {id:9,title:"Drum Set",price:60000,desc:"Drum Set — ₹60,000",img:"https://vivaafrika.co.za/wp-content/uploads/2022/04/VIVDRUHYB004-1.jpg"},
+ {id:10,title:"Cajón",price:3000,desc:"Cajón — ₹3,000",img:"https://cdn11.bigcommerce.com/s-qiwcuynfpu/images/stencil/1280x1280/products/524/2045/IMG_5507__90714__30889.1720731851.JPG?c=1"},
+ {id:11,title:"Dholak",price:6000,desc:"Dholak — ₹6,000",img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Dholak_dhol_drum%2C_one_of_many_percussion_instruments_of_South_Asia.jpg"},
+
+ // 🎹 Keyboard & Piano
+ {id:12,title:"Casio Keyboard",price:12000,desc:"Casio Keyboard — ₹12,000",img:"https://www.casio.com/content/dam/casio/product-info/locales/in/en/emi/product/C/CT/CTX/CT-X9000IN/assets/CT-X9000IN_F.jpg.transform/main-visual-sp/image.jpg"},
+ {id:13,title:"Digital Piano",price:25000,desc:"Digital Piano — ₹25,000",img:"https://cdn.korg.com/in/products/upload/778786bc42fe9c8f4f4c4b24eb9bd503_sp.png"},
+ {id:14,title:"Grand Piano",price:100000,desc:"Grand Piano — ₹1,00,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-LRO8BQEzDA95Lad-8Lo1nWJbfu4QPmkWFw&s"},
+
+ // 🎺 Wind
+ {id:15,title:"Flute (Bansuri)",price:2000,desc:"Flute (Bansuri) — ₹2,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBaft615n6Gofmy1dIeVnBVPeAb4BHxgj7yA&s"},
+ {id:16,title:"Clarinet",price:5000,desc:"Clarinet — ₹5,000",img:"https://www.yamaha.com/en/musical_instrument_guide/common/images/clarinet/structure_p02_03.jpg"},
+ {id:17,title:"Saxophone",price:20000,desc:"Saxophone — ₹20,000",img:"https://philharmonia-assets.s3.eu-west-1.amazonaws.com/uploads/2020/01/20092941/33_saxophone-960x600.jpg"},
+ {id:18,title:"Trumpet",price:30000,desc:"Trumpet — ₹30,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnoKClTRElUlxTzYwdJhxITfdS_nbaLzGtmg&s"},
+ {id:19,title:"Harmonica",price:3000,desc:"Harmonica — ₹3,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs4PHdpaJ34ln8S7BVv6RUcrt8TFIH9vr-hw&s"},
+ {id:20,title:"Shehnai",price:10000,desc:"Shehnai — ₹10,000",img:"https://www.binaswar.com/wp-content/uploads/2019/08/AB0_2509-2.jpg"},
+
+ // 🎶 Electronic
+ {id:21,title:"Keyboard Synthesizer",price:60000,desc:"Keyboard Synthesizer — ₹60,000",img:"https://m.media-amazon.com/images/I/71Lvef1TEZL._UF1000,1000_QL80_.jpg"},
+ {id:22,title:"Electronic Drum Pad",price:20000,desc:"Electronic Drum Pad — ₹20,000",img:"https://files.vplak.com/images/ashton/EDP450/black/image-1.jpg"},
+ {id:23,title:"Electric Violin",price:20000,desc:"Electric Violin — ₹20,000",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbRgzdafAFT2Mcy26V-PCljhomyNwTw3MgSg&s"}
+];
+
+let cart=JSON.parse(localStorage.getItem('cart')||'{}');
+let wishlist=JSON.parse(localStorage.getItem('wishlist')||'{}');
+const $=s=>document.querySelector(s);
+function money(v){return "₹"+v.toLocaleString("en-IN")}
+
+function renderProducts(){
+ const grid=$("#productGrid");grid.innerHTML="";
+ let q=$("#searchBox").value.toLowerCase();
+ PRODUCTS.filter(p=>p.title.toLowerCase().includes(q)).forEach(p=>{
+   const card=document.createElement("article");card.className="card";
+   card.innerHTML=`
+    <img src="${p.img}" alt="${p.title}" loading="lazy">
+    <h3>${p.title}</h3>
+    <p>${p.desc}</p>
+    <div class="row space">
+      <strong>${money(p.price)}</strong>
+      <div class="row">
+        <button class="btn ghost" onclick="openModal(${p.id})">View</button>
+        <button class="btn" onclick="addToCart(${p.id})">Add</button>
+        <button class="btn ghost" style="${wishlist[p.id]?'color:red;':''}" onclick="toggleWish(${p.id})">♥</button>
+      </div>
+    </div>`;
+   grid.appendChild(card);
+ });
+ renderCounts();
+}
+
+function renderCart(){
+ const cont=$("#cartItems");cont.innerHTML="";let total=0;
+ Object.entries(cart).forEach(([id,qty])=>{
+   const p=PRODUCTS.find(x=>x.id==id);if(!p)return;
+   total+=p.price*qty;
+   const row=document.createElement("div");row.className="cart-row";
+   row.innerHTML=`
+     <div style="flex:1">${p.title}<br><span class="small muted">${money(p.price)} × ${qty}</span></div>
+     <div style="text-align:right">
+       <div>${money(p.price*qty)}</div>
+       <div class="cart-controls">
+         <button class="btn ghost" onclick="changeQty(${p.id},-1)">−</button>
+         <button class="btn ghost" onclick="changeQty(${p.id},1)">＋</button>
+         <button class="btn ghost" onclick="removeFromCart(${p.id})">Remove</button>
+       </div>
+     </div>`;
+   cont.appendChild(row);
+ });
+ if(!Object.keys(cart).length) cont.innerHTML="<p class='muted'>Cart empty</p>";
+ $("#cartTotal").textContent=money(total);renderCounts();
+}
+
+function renderWish(){
+ const cont=$("#wishItems");cont.innerHTML="";
+ Object.keys(wishlist).forEach(id=>{
+   const p=PRODUCTS.find(x=>x.id==id);if(!p)return;
+   const row=document.createElement("div");row.className="cart-row";
+   row.innerHTML=`<div style="flex:1">${p.title}<br><span class="small muted">${money(p.price)}</span></div>
+   <div class="cart-controls">
+     <button class="btn ghost" onclick="addToCart(${p.id})">Add to Cart</button>
+     <button class="btn ghost" onclick="toggleWish(${p.id})">Remove</button>
+   </div>`;
+   cont.appendChild(row);
+ });
+ if(!Object.keys(wishlist).length) cont.innerHTML="<p class='muted'>Wishlist empty</p>";
+ renderCounts();
+}
+
+function renderCounts(){
+ $("#cartCount").textContent=Object.values(cart).reduce((a,b)=>a+b,0);
+ $("#wishCount").textContent=Object.keys(wishlist).length;
+ localStorage.setItem("cart",JSON.stringify(cart));
+ localStorage.setItem("wishlist",JSON.stringify(wishlist));
+}
+
+function addToCart(id){cart[id]=(cart[id]||0)+1;renderCart()}
+function changeQty(id,delta){let q=(cart[id]||0)+delta;if(q<=0) delete cart[id];else cart[id]=q;renderCart()}
+function removeFromCart(id){delete cart[id];renderCart()}
+function toggleWish(id){wishlist[id]?delete wishlist[id]:wishlist[id]=true;renderWish();renderProducts()}
+
+function openModal(id){
+ const p=PRODUCTS.find(x=>x.id==id);if(!p)return;
+ $("#modalBody").innerHTML=`<img src="${p.img}" alt="${p.title}" style="width:100%;height:240px;object-fit:cover;border-radius:8px"><h2>${p.title}</h2><p>${p.desc}</p><div class="row space"><strong>${money(p.price)}</strong><button class="btn" onclick="addToCart(${p.id})">Add to cart</button></div>`;
+ $("#productModal").classList.add("show");
+}
+$("#closeModal").onclick=()=>$("#productModal").classList.remove("show");
+
+$("#cartToggle").onclick=()=>{$("#cartDrawer").classList.add("open");renderCart()};
+$("#closeCart").onclick=()=>$("#cartDrawer").classList.remove("open");
+$("#wishlistToggle").onclick=()=>{$("#wishDrawer").classList.add("open");renderWish()};
+$("#closeWish").onclick=()=>$("#wishDrawer").classList.remove("open");
+$("#checkoutBtn").onclick=()=>{if(!Object.keys(cart).length){alert("Cart empty");return;}alert("Order placed (demo)!");cart={};renderCart();$("#cartDrawer").classList.remove("open");}
+$("#searchBox").addEventListener("input",renderProducts);
+
+renderProducts();renderCart();renderWish();
+</script>
+</body>
+</html>
