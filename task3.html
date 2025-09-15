@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Project with Quiz & API</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
+
+/* Header & Nav */
+header { background:#333; color:white; padding:1em 0; text-align:center; }
+nav { display:flex; justify-content:center; gap:20px; }
+nav a { color:white; text-decoration:none; padding:0.5em 1em; border-radius:5px; }
+nav a:hover { background:#555; }
+
+/* Layout */
+main { display:grid; grid-template-columns:1fr 300px; gap:20px; padding:20px; }
+.content { background:white; padding:20px; border-radius:8px; }
+.sidebar { background:#fff8dc; padding:20px; border-radius:8px; }
+footer { background:#333; color:white; text-align:center; padding:1em; }
+
+/* Quiz */
+.quiz-container { background:#fff; padding:20px; margin-top:20px; border-radius:8px; }
+.quiz-container h3 { margin-top:0; }
+.result { font-weight: bold; margin-top:10px; color:green; }
+
+/* API Section */
+.api-container { background:white; padding:20px; margin-top:20px; border-radius:8px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    nav { flex-direction: column; }
+}
+
+/* Hide/Show Sections */
+.hidden { display: none; }
+#backToMain {display: none; cursor: pointer; margin-top: 10px;}
+
+#copyright {
+    background-color: #333;
+    color: white;
+    padding: 1em;
+    text-align: center;
+    margin-top: 20px;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<h1>My Responsive Website</h1>
+<nav>
+    <a href="#" id="homeLink">Home</a>
+    <a href="#" id="quizLink">Quiz</a>
+</nav>
+</header>
+
+<main>
+    <section class="content">
+
+        <!-- API Content -->
+        <div id="apiContent">
+            <h2>Main Content</h2>
+            <p>This is where the main content goes.</p>
+
+            <div class="api-container">
+                <h2>Random Joke</h2>
+                <p id="joke">Click the button for a joke!</p>
+                <button onclick="fetchJoke()">Get Joke</button>
+            </div>
+        </div>
+        <a href="#" id="backToMain" class="hidden">Back to Main</a>
+
+        <!-- Quiz Content -->
+        <div id="quizContent" class="quiz-container hidden">
+            <h2>Interactive Quiz</h2>
+            <form id="quizForm">
+                <div>
+                    <h3>1. What does HTML stand for?</h3>
+                    <label><input type="radio" name="q1" value="a"> Hyper Text Markup Language</label><br>
+                    <label><input type="radio" name="q1" value="b"> Home Tool Markup Language</label>
+                </div>
+                <div>
+                    <h3>2. Which CSS property changes text color?</h3>
+                    <label><input type="radio" name="q2" value="a"> font-style</label><br>
+                    <label><input type="radio" name="q2" value="b"> color</label>
+                </div>
+                <button type="submit">Submit Quiz</button>
+                <div class="result" id="quizResult"></div>
+<p><p>
+            </form>
+        </div>
+
+    </section>
+
+    <aside class="sidebar">
+        <h3>Sidebar</h3>
+        <p>Extra content, links, etc.</p>
+    </aside>
+
+     </main>
+
+
+<footer>
+    <p>&copy; 2025 My Website</p>
+</footer>
+<p><p>
+
+<script>
+/* API Fetch */
+function fetchJoke() {
+    fetch("https://official-joke-api.appspot.com/random_joke")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("joke").textContent = `${data.setup} - ${data.punchline}`;
+        })
+        .catch(err => console.error("Error fetching joke:", err));
+}
+
+/* Quiz Logic */
+document.getElementById("quizForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    let score = 0;
+    const answers = { q1: "a", q2: "b" };
+    for (let q in answers) {
+        let selected = document.querySelector(`input[name="${q}"]:checked`);
+        if (selected && selected.value === answers[q]) score++;
+    }
+    document.getElementById("quizResult").textContent = `You scored ${score}/2!`;
+});
+
+/* Navigation */
+document.getElementById("quizLink").addEventListener("click", function(e) {
+    e.preventDefault();
+    document.getElementById("apiContent").classList.add("hidden");
+    document.getElementById("quizContent").classList.remove("hidden");
+    document.getElementById("backToMain").classList.remove("hidden");
+});
+
+document.getElementById("backToMain").addEventListener("click", function(e) {
+        e.preventDefault();
+        document.getElementById("apiContent").classList.remove("hidden");
+        document.getElementById("quizContent").classList.add("hidden");
+        document.getElementById("backToMain").classList.add("hidden");
+    });
+
+document.getElementById("homeLink").addEventListener("click", function(e) {
+    e.preventDefault();
+    document.getElementById("apiContent").classList.remove("hidden");
+    document.getElementById("quizContent").classList.add("hidden");
+    document.getElementById("backToMain").classList.add("hidden");
+});
+</script>
+</body>
+</html>
