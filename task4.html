@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    /* Header and Navigation */
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 1em 0;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5em 1em;
+      border-radius: 5px;
+    }
+
+    nav a:hover {
+      background-color: #555;
+    }
+
+    /* Main Content */
+    main {
+      padding: 20px;
+      min-height: 500px;
+      /* Ensure some minimum height for content */
+    }
+
+    .content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 1em 0;
+      position: relative;
+      /* Needed for sticky footer */
+      bottom: 0;
+      /* Needed for sticky footer */
+      width: 100%;
+      /* Needed for sticky footer */
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+      }
+    }
+
+    /* Product Filtering Styles */
+    #filterControls {
+      margin-bottom: 20px;
+    }
+
+    #productList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .product {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 200px;
+      text-align: center;
+    }
+
+    /* Contact Form Styles */
+    #contactForm label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    #contactForm input,
+    #contactForm textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    /* Hidden Section Styles */
+    .hidden-section {
+      display: none;
+    }
+
+    /* To-Do List Styles */
+    #todoListContainer {
+      margin-top: 20px;
+    }
+
+    #todoInput {
+      width: 70%;
+      padding: 8px;
+      margin-right: 10px;
+    }
+
+    #todoList {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #todoList li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #todoList li button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    /* Projects Section Styles */
+    .project-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .project-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    /* Portfolio Image Styling */
+    #portfolioImage {
+      max-width: 200px;
+      /* Adjust as needed */
+      height: auto;
+      border-radius: 5px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      display: block;
+      /* Ensure it takes up the full width available */
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>My Portfolio</h1>
+    <nav>
+      <a href="#" onclick="showSection('home')">Home</a>
+      <a href="#" onclick="showSection('about')">About</a>
+      <a href="#" onclick="showSection('projects')">Projects</a>
+      <a href="#" onclick="showSection('contact')">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="home" class="content">
+      <h2>Welcome!</h2>
+      <img id="portfolioImage" src="https://mir-s3-cdn-cf.behance.net/projects/404/49f28e189617081.Y3JvcCwxMDA2LDc4NywxOTYsMA.jpg" alt="My Photo">
+      <p>Hi, I'm Lahari, a B.Tech 4th year student in Computer Science.</p>
+
+      <div id="todoListContainer">
+        <h3>To-Do List</h3>
+        <input type="text" id="todoInput" placeholder="Add a task">
+        <button onclick="addTask()">Add Task</button>
+        <ul id="todoList"></ul>
+      </div>
+      <div id="products" class="content">
+        <h2>Products</h2>
+        <div id="filterControls">
+          <label for="categoryFilter">Category:</label>
+          <select id="categoryFilter">
+            <option value="all">All</option>
+            <option value="jewelry">Jewelry</option>
+            <option value="toys">Toys</option>
+          </select>
+
+          <label for="priceSort">Sort by Price:</label>
+          <select id="priceSort">
+            <option value="none">None</option>
+            <option value="lowToHigh">Low to High</option>
+            <option value="highToLow">High to Low</option>
+          </select>
+        </div>
+
+        <div id="productList">
+          <!-- Products will be loaded here -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="content hidden-section">
+      <h2>About Me</h2>
+      <p>I am a passionate and driven B.Tech Computer Science student in my final year, eager to apply my skills and
+        knowledge to innovative projects and challenging real-world problems. My academic journey has equipped me with
+        a strong foundation in programming, data structures, algorithms, and software development methodologies.</p>
+
+      <p>I am particularly interested in fields like artificial intelligence, machine learning, and computer vision. I
+        am always seeking opportunities to enhance my skills, stay up-to-date with the latest technological trends, and
+        contribute to meaningful projects that make a positive impact.</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="content hidden-section">
+      <h2>My Projects</h2>
+
+      <div class="project-item">
+        <h3>Rock, Paper, Scissors Game</h3>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnFHB84AWQjwMBhknZOnX2Eyy94QId_bOBqv7uGJ2-3Yw7wOrWGsD7eCuDOmTwNBGVtK8&usqp=CAU" alt="Rock Paper Scissors Game Image">
+        <p>
+          <strong>Description:</strong> A classic hand game where Rock beats Scissors, Scissors beat Paper, and
+          Paper beats Rock. <br><br>
+          In a GUI-based version (e.g., built using Python Tkinter or Java Swing), players can click buttons to
+          choose their move, while the computer selects randomly.
+        </p>
+      </div>
+
+      <div class="project-item">
+        <h3>Face Emotion Recognition</h3>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA-LJAo2Dm7gELKqqotUT8I_796r46Xp_X8A&s" alt="Face Emotion Recognition Image">
+        <p>
+          <strong>Description:</strong> Face emotion recognition is a computer vision and machine learning technique
+          used to automatically identify human emotions from facial expressions.
+ <br><br>It combines image processing, feature extraction, and classification algorithms to analyze a person’s face and map it to an emotional state such
+          as happiness, sadness, anger, fear, surprise, disgust, or neutral.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="content hidden-section">
+      <h2>Contact Me</h2>
+      <form id="contactForm" onSubmit="submitForm()">
+        <label for="name">Name:</label><input type="text" id="name"><br>
+        <label for="email">Email:</label><input type="email" id="email"><br>
+        <label for="message">Message:</label><textarea id="message"></textarea><br>
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2025 My Portfolio</p>
+  </footer>
+
+  <script>
+    // Function to show a section and hide others
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('main > section');
+      sections.forEach(section => {
+        section.classList.add('hidden-section');
+      });
+
+      const sectionToShow = document.getElementById(sectionId);
+      sectionToShow.classList.remove('hidden-section');
+    }
+
+    // To-Do List
+    function addTask() {
+      const todoInput = document.getElementById('todoInput');
+      const todoList = document.getElementById('todoList');
+      const taskText = todoInput.value.trim();
+
+      if (taskText) {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+                    ${taskText}
+                    <button onclick="removeTask(this)">Remove</button>
+                `;
+        todoList.appendChild(listItem);
+        todoInput.value = ''; // Clear the input
+      }
+    }
+
+    function removeTask(button) {
+      const listItem = button.parentNode;
+      listItem.remove();
+    }
+
+
+    // Product Filtering/Sorting
+    document.addEventListener('DOMContentLoaded', function() {
+      const categoryFilter = document.getElementById('categoryFilter');
+      const priceSort = document.getElementById('priceSort');
+      const productList = document.getElementById('productList');
+
+      // Sample products data
+      const products = [{
+          id: 5,
+          name: 'Necklace',
+          category: 'jewelry',
+          price: 250
+        },
+        {
+          id: 6,
+          name: 'Earrings',
+          category: 'jewelry',
+          price: 100
+        },
+        {
+          id: 7,
+          name: 'Action Figure',
+          category: 'toys',
+          price: 30
+        },
+        {
+          id: 8,
+          name: 'Building Blocks',
+          category: 'toys',
+          price: 45
+        },
+        {
+          id: 9,
+          name: 'Diamond Ring',
+          category: 'jewelry',
+          price: 1500
+        },
+        {
+          id: 10,
+          name: 'Robot Toy',
+          category: 'toys',
+          price: 75
+        }
+
+      ];
+
+      function displayProducts(productsToDisplay) {
+        productList.innerHTML = ''; // Clear existing products
+        productsToDisplay.forEach(product => {
+          const productDiv = document.createElement('div');
+          productDiv.classList.add('product');
+          productDiv.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p>Category: ${product.category}</p>
+                        <p>Price: $${product.price}</p>
+                    `;
+          productList.appendChild(productDiv);
+        });
+      }
+
+      function applyFilters() {
+        let filteredProducts = products;
+
+        // Category Filter
+        const categoryValue = categoryFilter.value;
+        if (categoryValue !== 'all') {
+          filteredProducts = filteredProducts.filter(product => product.category === categoryValue);
+        }
+
+        // Price Sort
+        const sortValue = priceSort.value;
+        if (sortValue !== 'none') {
+          filteredProducts.sort((a, b) => {
+            if (sortValue === 'lowToHigh') {
+              return a.price - b.price;
+            } else if (sortValue === 'highToLow') {
+              return b.price - a.price;
+            }
+            return 0;
+          });
+        }
+
+        displayProducts(filteredProducts);
+      }
+
+      // Initial display on Products section
+      if (document.getElementById('products').classList.contains('content')) {
+        displayProducts(products);
+      }
+
+      // Event listeners for filter/sort changes
+      categoryFilter.addEventListener('change', applyFilters);
+      priceSort.addEventListener('change', applyFilters);
+    });
+
+    // Initially show the Home section
+    showSection('home');
+
+  function submitForm() {
+    alert("Successfully Submitted");
+  }
+  </script>
+
+</body>
+
+</html>
